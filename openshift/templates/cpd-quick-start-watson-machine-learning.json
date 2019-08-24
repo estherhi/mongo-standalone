@@ -1,0 +1,286 @@
+{
+	"apiVersion": "v1",
+	"kind": "Template",
+	"labels": {
+		"app": "cpd-quick-start-watson-machine-learning",
+		"template": "cpd-quick-start-watson-machine-learning"
+	},
+	"message": "The following apps have been created in your project: ${EVENT_PRODUCER_NAME} and ${MACHINE_LEARNING_SCORING_NAME}.\n\nFor more information about using this template see https://github.com/estherhi/cpd-quick-start-watson-machine-learning.",
+	"metadata": {
+		"annotations": {
+			"description": "A sample application demonstrating Watson Machine Learning. For more information about using this template see https://github.com/estherhi/cpd-quick-start-watson-machine-learning",
+			"iconClass": "icon-python",
+			"openshift.io/display-name": "CPD Quick Start Watson Machine Learning",
+			"openshift.io/documentation-url": "https://github.com/TBD",
+			"openshift.io/long-description": "A sample application demonstrating Watson Machine Learning. For more information about using this template see https://github.com/estherhi/cpd-quick-start-watson-machine-learning",
+			"openshift.io/provider-display-name": "IBM",
+			"tags": "quickstart,python,postgreSQL,watson,watson-machine-learning,mongoDB"
+		},
+		"name": "cpd-quick-start-watson-machine-learning"
+	},
+	"objects": [
+		{
+			"apiVersion": "v1",
+			"kind": "ImageStream",
+			"metadata": {
+				"annotations": {
+					"description": "Keeps track of changes in the application image"
+				},
+				"name": "${EVENT_PRODUCER_NAME}"
+			}
+		},
+		{
+			"apiVersion": "v1",
+			"kind": "BuildConfig",
+			"metadata": {
+				"annotations": {
+					"description": "Defines how to build the application",
+					"template.alpha.openshift.io/wait-for-ready": "true"
+				},
+				"name": "${EVENT_PRODUCER_NAME}"
+			},
+			"spec": {
+				"output": {
+					"to": {
+						"kind": "ImageStreamTag",
+						"name": "${EVENT_PRODUCER_NAME}:latest"
+					}
+				},
+				"source": {
+                    "contextDir": "${EVENT_PRODUCER_CONTEXT_DIR}",
+                    "git": {
+                        "ref": "${SOURCE_REPOSITORY_REF}",
+                        "uri": "${SOURCE_REPOSITORY_URL}"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "sourceStrategy": {
+                        "env": [
+                            {
+                                "name": "PIP_INDEX_URL",
+                                "value": "${PIP_INDEX_URL}"
+                            },
+							{
+								"name": "UPGRADE_PIP_TO_LATEST",
+								"value": "true"
+							}
+						],
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "python:${PYTHON_VERSION}",
+                            "namespace": "${NAMESPACE}"
+                        }
+                    },
+                    "type": "Source"
+                },
+				"triggers": [
+					{
+						"type": "ImageChange"
+					},
+					{
+						"type": "ConfigChange"
+					},
+					{
+						"github": {
+							"secret": "${GITHUB_WEBHOOK_SECRET}"
+						},
+						"type": "GitHub"
+					},
+					{
+						"generic": {
+							"secret": "${GENERIC_WEBHOOK_SECRET}"
+						},
+						"type": "Generic"
+					}
+				]
+			}
+		},
+		{
+			"apiVersion": "v1",
+			"kind": "DeploymentConfig",
+			"metadata": {
+				"annotations": {
+					"description": "Defines how to deploy the service",
+					"template.alpha.openshift.io/wait-for-ready": "true"
+				},
+				"name": "${EVENT_PRODUCER_NAME}"
+			},
+			"spec": {
+				"replicas": 1,
+				"selector": {
+					"name": "${EVENT_PRODUCER_NAME}"
+				},
+				"strategy": {
+					"type": "Recreate"
+				},
+				"template": {
+					"metadata": {
+						"labels": {
+							"name": "${EVENT_PRODUCER_NAME}"
+						},
+						"name": "${EVENT_PRODUCER_NAME}"
+					},
+					"spec": {
+						"containers": [
+							{
+								"name": "container-event-producer",
+								"image": " ",
+								"env": [
+									{
+										"name": "MONGODB_HOST",
+										"value": "${MONGODB_HOST}"
+									},
+									{
+
+										"name": "MONGODB_PORT",
+										"value": "${MONGODB_PORT}"
+									},
+									{
+										"name": "MONGODB_USER",
+										"value": "${MONGODB_USER}"
+									},
+									{
+										"name": "MONGODB_PASSWORD",
+										"value": "${MONGODB_USER}"
+									},
+									{
+										"name": "MONGODB_DATABASE",
+										"value": "${MONGODB_DATABASE}"
+									},
+									{
+										"name": "APP_FILE",
+										"value": "${EVENT_PRODUCER_APP_FILE}"
+									}
+								],
+								"resources": {
+									"limits": {
+										"memory": "${MEMORY_LIMIT}"
+									}
+								}
+							}
+						]
+					}
+				},
+				"triggers": [
+					{
+						"imageChangeParams": {
+							"automatic": true,
+							"containerNames": [
+								"container-event-producer"
+							],
+							"from": {
+								"kind": "ImageStreamTag",
+								"name": "${EVENT_PRODUCER_NAME}:latest"
+							}
+						},
+						"type": "ImageChange"
+					},
+					{
+						"type": "ConfigChange"
+					}
+				]
+			}
+		}
+	],
+	"parameters": [
+		{
+			"description": "The name of the producer service",
+			"displayName": "Event Producer Name",
+			"name": "EVENT_PRODUCER_NAME",
+			"required": true,
+			"value": "mongo-test"
+		},
+		{
+            "description": "Version of Python image to be used (3.6 or latest).",
+            "displayName": "Version of Python Image",
+            "name": "PYTHON_VERSION",
+            "required": true,
+            "value": "3.6"
+        },
+		{
+			"displayName": "MongoDB database host",
+			"name": "MONGODB_HOST",
+			"required": true
+		},
+		{
+			"displayName": "MongoDB database port",
+			"name": "MONGODB_PORT",
+			"required": false,
+			"value": "27017"
+		},
+		{
+			"displayName": "MongoDB database user",
+			"name": "MONGODB_USER",
+			"required": true
+		},
+		{
+			"displayName": "MongoDB database password",
+			"name": "MONGODB_PASSWORD",
+			"required": true
+		},
+		{
+			"displayName": "MongoDB database name",
+			"name": "MONGODB_DATABASE",
+			"required": true
+		},
+		{
+			"description": "The OpenShift Namespace where the ImageStream resides.",
+			"displayName": "Namespace",
+			"name": "NAMESPACE",
+			"required": true,
+			"value": "openshift"
+		},
+		{
+			"description": "Maximum amount of memory the Node.js container can use.",
+			"displayName": "Memory Limit",
+			"name": "MEMORY_LIMIT",
+			"required": true,
+			"value": "512Mi"
+		},
+		{
+			"description": "The URL of the repository with your application source code.",
+			"displayName": "Git Repository URL",
+			"name": "SOURCE_REPOSITORY_URL",
+			"required": true,
+			"value": "https://github.com/estherhi/cpd-quick-start-watson-machine-learning"
+		},
+		{
+			"description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch.",
+			"displayName": "Git Reference",
+			"name": "SOURCE_REPOSITORY_REF"
+		},
+		{
+			"description": "Set this to the relative path to your project if it is not in the root of your repository.",
+			"displayName": "Context Directory for the event simulator",
+			"name": "EVENT_PRODUCER_CONTEXT_DIR",
+			"value": "reefer-container-simulator"
+		},
+		{
+			"description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+			"displayName": "GitHub Webhook Secret",
+			"from": "[a-zA-Z0-9]{40}",
+			"generate": "expression",
+			"name": "GITHUB_WEBHOOK_SECRET"
+		},
+		{
+			"description": "A secret string used to configure the Generic webhook.",
+			"displayName": "Generic Webhook Secret",
+			"from": "[a-zA-Z0-9]{40}",
+			"generate": "expression",
+			"name": "GENERIC_WEBHOOK_SECRET"
+		},
+		{
+            "description": "The custom PyPi index URL",
+            "displayName": "Custom PyPi Index URL",
+            "name": "PIP_INDEX_URL",
+            "value": ""
+        },
+		{
+			"description": "The event producer application file to run",
+			"displayName": "Event Producer Application file",
+			"name": "EVENT_PRODUCER_APP_FILE",
+			"value": "container_events_producer.py"
+		}
+	]
+}
