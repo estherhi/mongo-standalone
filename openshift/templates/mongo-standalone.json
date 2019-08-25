@@ -256,7 +256,7 @@
 			"name": "EVENT_PRODUCER_CONTEXT_DIR",
 			"value": "mongo-test"
 		},
-		{{
+		{
 			"apiVersion": "v1",
 			"kind": "Template",
 			"labels": {
@@ -390,7 +390,6 @@
 												"value": "${MONGODB_HOST}"
 											},
 											{
-
 												"name": "MONGODB_PORT",
 												"value": "${MONGODB_PORT}"
 											},
@@ -541,25 +540,6 @@
 					"value": "test-mongo.py"
 				}
 			]
-		},
-			"description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
-			"displayName": "GitHub Webhook Secret",
-			"from": "[a-zA-Z0-9]{40}",
-			"generate": "expression",
-			"name": "GITHUB_WEBHOOK_SECRET"
-		},
-		{
-			"description": "A secret string used to configure the Generic webhook.",
-			"displayName": "Generic Webhook Secret",
-			"from": "[a-zA-Z0-9]{40}",
-			"generate": "expression",
-			"name": "GENERIC_WEBHOOK_SECRET"
-		},
-		{
-            "description": "The custom PyPi index URL",
-            "displayName": "Custom PyPi Index URL",
-            "name": "PIP_INDEX_URL",
-            "value": ""
-        }
+		}
 	]
 }
