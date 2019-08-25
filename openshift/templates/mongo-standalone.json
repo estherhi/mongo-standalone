@@ -124,7 +124,7 @@
 					"spec": {
 						"containers": [
 							{
-								"name": "container-event-producer",
+								"name": "mango-test",
 								"image": " ",
 								"env": [
 									{
@@ -560,12 +560,6 @@
             "displayName": "Custom PyPi Index URL",
             "name": "PIP_INDEX_URL",
             "value": ""
-        },
-		{
-			"description": "The event producer application file to run",
-			"displayName": "Event Producer Application file",
-			"name": "EVENT_PRODUCER_APP_FILE",
-			"value": "container_events_producer.py"
-		}
+        }
 	]
 }
