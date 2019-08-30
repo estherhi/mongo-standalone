@@ -167,7 +167,7 @@
 						"imageChangeParams": {
 							"automatic": true,
 							"containerNames": [
-								"container-event-producer"
+								"mango-test"
 							],
 							"from": {
 								"kind": "ImageStreamTag",
