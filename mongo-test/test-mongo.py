@@ -28,8 +28,9 @@ def main():
         predictions = db['reefer_container_predictions']
         prediction_row = {'id': 1234,
                           'maintenance_required': 'true'}
-        logging.debug(prediction_row)
         predictions.insert_one(prediction_row)
+        details = predictions.find_one({'id': 1234})
+        logging.info(details)
 
     except Exception as err:
         logging.error(err)
