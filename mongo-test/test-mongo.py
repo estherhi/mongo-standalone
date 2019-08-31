@@ -2,6 +2,8 @@ from pymongo import MongoClient
 import logging
 import sys
 from config.mongodb import mongo_config
+from random import randint
+import time
 
 
 def setup_logger():
@@ -25,13 +27,15 @@ def main():
         while True:
             client = connect_to_mongo_db()
             db = client[mongo_config()['database']]
-            print(db.name)
+            print("database name " + db.name)
             predictions = db['reefer_container_predictions']
-            prediction_row = {'id': 1234,
+            id = randint(1000, 9990)
+            prediction_row = {'id': id,
                               'maintenance_required': 'true'}
             predictions.insert_one(prediction_row)
-            details = predictions.find_one({'id': 1234})
+            details = predictions.find_one({'id': id})
             logging.info(details)
+            time.sleep(2.5)
 
     except Exception as err:
         logging.error(err)
