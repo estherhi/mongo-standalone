@@ -22,15 +22,16 @@ def connect_to_mongo_db():
 def main():
     setup_logger()
     try:
-        client = connect_to_mongo_db()
-        db = client[mongo_config()['database']]
-        print(db.name)
-        predictions = db['reefer_container_predictions']
-        prediction_row = {'id': 1234,
-                          'maintenance_required': 'true'}
-        predictions.insert_one(prediction_row)
-        details = predictions.find_one({'id': 1234})
-        logging.info(details)
+        while True:
+            client = connect_to_mongo_db()
+            db = client[mongo_config()['database']]
+            print(db.name)
+            predictions = db['reefer_container_predictions']
+            prediction_row = {'id': 1234,
+                              'maintenance_required': 'true'}
+            predictions.insert_one(prediction_row)
+            details = predictions.find_one({'id': 1234})
+            logging.info(details)
 
     except Exception as err:
         logging.error(err)
