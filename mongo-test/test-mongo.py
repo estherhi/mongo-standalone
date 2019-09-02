@@ -24,8 +24,8 @@ def connect_to_mongo_db():
 def main():
     setup_logger()
     try:
+        client = connect_to_mongo_db()
         while True:
-            client = connect_to_mongo_db()
             db = client[mongo_config()['database']]
             print("database name " + db.name)
             predictions = db['reefer_container_predictions']
